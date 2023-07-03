@@ -60,17 +60,17 @@ func getTodo(context *gin.Context) {
 
 }
 
-func editTodo(context *gin.Context) {
+func toggleTodo(context *gin.Context) {
 	id := context.Param("id")
+	todo, err := getTodoId(id)
 
-	for _, t := range todos {
-		if t.ID == id {
-			t.Todos = !t.Todos
-			context.IndentedJSON(http.StatusOK, todos)
-
-		}
+	if err != nil {
+		context.IndentedJSON(http.StatusNotFound, gin.H{"message": "Todo not found"})
 	}
 
+	todo.Todos = !todo.Todos
+
+	context.IndentedJSON(http.StatusOK, todo)
 }
 
 func main() {
@@ -78,6 +78,6 @@ func main() {
 	router.GET("/todo", getTodos)
 	router.POST("/todo", addTodos)
 	router.GET("/todo/:id", getTodo)
-	router.GET("/todo/edit/:id", editTodo)
+	router.PATCH("/todo/:id", toggleTodo)
 	router.Run("localhost:8080")
 }
